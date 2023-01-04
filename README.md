@@ -1,5 +1,5 @@
 # Video_annotator
-This is an application that speed up labeling the videos in a machine learning pipeline
+This is an application that speeds up labeling the videos in a machine learning pipeline
 
 # Specification
 Python 3.9.12
