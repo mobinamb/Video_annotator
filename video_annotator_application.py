@@ -1,4 +1,3 @@
-#3) run the exe file or the following code
 import cv2
 import numpy as np
 from skimage import exposure
@@ -9,6 +8,7 @@ from PyQt5.QtCore import Qt, QTimer
 import pyautogui as pg
 import os
 import time
+from PyQt5.QtWidgets import QApplication, QWidget,QPushButton,QHBoxLayout,QVBoxLayout,QStyle,QFileDialog,QLabel,QLineEdit,QCheckBox
 
 class Window(QWidget):
     def __init__(self):
@@ -70,27 +70,24 @@ class Window(QWidget):
         
         self.brightness_value_now = 30 # Updated brightness value
 
-
         self.filterBtn=QCheckBox('Filter (f)')
         self.filterBtn.setShortcut('f')
         self.filterlabel=QLabel("f")
-        
-        self.labelBtn=QCheckBox('Label (l)')
-        self.labelBtn.setShortcut('l')
-        self.labellabel=QLabel("l")
 
-
-        self.cursorBtn=QCheckBox('Cursor Tracking (c)')
+        self.cursorBtn=QCheckBox('(c)')
         self.cursorBtn.setShortcut('c')
         self.cursorlabel=QLabel("c")
+
+        self.line = QLineEdit(self)
+        self.linelabel=QLabel("Label")
 
         hbox=QHBoxLayout()
         hbox.setContentsMargins(0,0,0,0)
         hbox.addWidget(self.openBtn)
-        
-        #
         hbox.addWidget(self.line_edit)
         hbox.addWidget(self.line_editlabel)
+        
+        #
         hbox.addWidget(self.previousBtn)
         #
         hbox.addWidget(self.playBtn)
@@ -101,17 +98,20 @@ class Window(QWidget):
         #
 
         hbox.addWidget(self.filterBtn)
-        hbox.addWidget(self.labelBtn)
+        hbox.addWidget(self.line)
+
         hbox.addWidget(self.cursorBtn)
         #
         hbox1=QHBoxLayout()
         hbox1.addWidget(self.openlabel)
+        hbox1.addWidget(self.line_edit)
+        hbox1.addWidget(self.line_editlabel)
         hbox1.addWidget(self.previouslabel)
         hbox1.addWidget(self.playlabel)
         hbox1.addWidget(self.pauselabel)
         hbox1.addWidget(self.nextlabel)
         hbox1.addWidget(self.filterlabel)
-        hbox1.addWidget(self.labellabel)
+        hbox1.addWidget(self.linelabel)
         hbox1.addWidget(self.cursorlabel)
         hbox1.setSpacing(1)
         
@@ -126,7 +126,6 @@ class Window(QWidget):
         self.pauseBtn.setEnabled(True)
 
         self.filterBtn.setEnabled(False)
-        self.labelBtn.setEnabled(False)
         self.cursorBtn.setEnabled(False)
         self.dir=self.filename.replace(self.filename.split('/')[-1],'')[:-1]
         
@@ -160,7 +159,6 @@ class Window(QWidget):
         self.timer.stop()
 
         self.filterBtn.setEnabled(True)
-        self.labelBtn.setEnabled(True)
         self.cursorBtn.setEnabled(True)
 
         self.previousBtn.setEnabled(True)
@@ -248,16 +246,67 @@ class Window(QWidget):
                 self.unsetCursor()
             cv2.circle(self.frame,(int(self.cursor[self.frame_num-1][0]*self.image_label.width()),int(self.cursor[self.frame_num-1][1]*self.image_label.height())),radius=10,color=(0,255,0),thickness=-1)
 
-            if self.labelBtn.isChecked()==True:
+            if self.line.text()=='2':
                 self.setCursor(Qt.BlankCursor)
                 numm=[(pg.position()[0]-self.pos().x()-self.image_label.x())/self.image_label.width(),(pg.position()[1]-self.pos().y()-self.image_label.y())/self.image_label.height()]
-                if 0<=numm[0]<1//3:
+               
+                if 0<=numm[0]<1/2-0.05:
                     self.cursor[self.frame_num-1]=[0,0]
-                elif 1//3<=numm[0]<2//3:
+                elif 1/2-0.05<=numm[0]<1/2+0.05:
                     self.cursor[self.frame_num-1]=[0.5,0.5]
                 else:
                     self.cursor[self.frame_num-1]=[1,1]
-            
+
+                self.frame=cv2.line(self.frame,(int(self.image_label.width()/2-0.1*self.image_label.width()),0),(int(self.image_label.width()/2-0.1*self.image_label.width()),self.image_label.height()),(255,0,255),5)
+                self.frame=cv2.line(self.frame,(int(self.image_label.width()/2+0.1*self.image_label.width()),0),(int(self.image_label.width()/2+0.1*self.image_label.width()),self.image_label.height()),(255,0,255),5)
+             
+
+            elif self.line.text()=='3':
+                self.setCursor(Qt.BlankCursor)
+                numm=[(pg.position()[0]-self.pos().x()-self.image_label.x())/self.image_label.width(),(pg.position()[1]-self.pos().y()-self.image_label.y())/self.image_label.height()]
+                
+                if 0<=numm[0]<1/3-0.05:
+                    self.cursor[self.frame_num-1]=[0,0]
+                elif 1/3-0.05<=numm[0]<1/3+0.05:
+                    self.cursor[self.frame_num-1]=[0.5,0.5]
+                elif 1/3+0.05<=numm[0]<2/3-0.05:
+                    self.cursor[self.frame_num-1]=[1,1]
+                elif 2/3-0.05<=numm[0]<2/3+0.05:
+                    self.cursor[self.frame_num-1]=[1.5,1.5]
+                else:
+                    self.cursor[self.frame_num-1]=[2,2]
+
+                self.frame=cv2.line(self.frame,(int(self.image_label.width()/3-0.05*self.image_label.width()),0),(int(self.image_label.width()/3-0.05*self.image_label.width()),self.image_label.height()),(255,0,255),5)
+                self.frame=cv2.line(self.frame,(int(self.image_label.width()/3+0.05*self.image_label.width()),0),(int(self.image_label.width()/3+0.05*self.image_label.width()),self.image_label.height()),(255,0,255),5)
+    
+                self.frame=cv2.line(self.frame,(int(2*self.image_label.width()/3-0.05*self.image_label.width()),0),(int(2*self.image_label.width()/3-0.05*self.image_label.width()),self.image_label.height()),(255,0,255),5)
+                self.frame=cv2.line(self.frame,(int(2*self.image_label.width()/3+0.05*self.image_label.width()),0),(int(2*self.image_label.width()/3+0.05*self.image_label.width()),self.image_label.height()),(255,0,255),5)
+    
+            elif self.line.text()=='4':
+                self.setCursor(Qt.BlankCursor)
+                numm=[(pg.position()[0]-self.pos().x()-self.image_label.x())/self.image_label.width(),(pg.position()[1]-self.pos().y()-self.image_label.y())/self.image_label.height()]
+                
+                if 0<=numm[0]<1/2-0.05 and  0<=numm[1]<1/2-0.05:
+                    self.cursor[self.frame_num-1]=[0,0]
+                elif 1/2<=numm[1]<1/2+0.05 and 1/2-0.05<=numm[0]<1/2+0.05:
+                    self.cursor[self.frame_num-1]=[0.5,0.5]
+                elif 1/2+0.05<=numm[0] and 1/2+0.05<=numm[1]:
+                    self.cursor[self.frame_num-1]=[1,1]
+                elif 1/2-0.05<=numm[1]<1/2 and 0<=numm[0]<1/2-0.05:
+                    self.cursor[self.frame_num-1]=[1.5,1.5]
+                elif 0<=numm[0]<1/2-0.05 and 0<=numm[1]<1/2-0.05:
+                    self.cursor[self.frame_num-1]=[2,2]
+                elif 0<=numm[0]<1/2-0.05 and 1/2<=numm[1]<1/2+0.05:
+                    self.cursor[self.frame_num-1]=[2.5,2.5]
+                else:
+                    self.cursor[self.frame_num-1]=[3,3]
+
+                self.frame=cv2.line(self.frame,(int(self.image_label.width()/2-0.05*self.image_label.width()),0),(int(self.image_label.width()/2-0.05*self.image_label.width()),self.image_label.height()),(255,0,255),5)
+                self.frame=cv2.line(self.frame,(int(self.image_label.width()/2+0.05*self.image_label.width()),0),(int(self.image_label.width()/2+0.05*self.image_label.width()),self.image_label.height()),(255,0,255),5)
+     
+                self.frame=cv2.line(self.frame,(0,int(self.image_label.height()/2-0.05*self.image_label.height())),(self.image_label.width(),int(self.image_label.height()/2-0.05*self.image_label.height())),(255,0,255),5)
+                self.frame=cv2.line(self.frame,(0,int(self.image_label.height()/2+0.05*self.image_label.height())),(self.image_label.width(),int(self.image_label.height()/2+0.05*self.image_label.height())),(255,0,255),5)
+    
 
             #print((int(self.cursor[self.frame_num][0]*self.image_label.width()),int(self.cursor[self.frame_num][1]*self.image_label.height())))
 
@@ -270,6 +319,7 @@ class Window(QWidget):
             self.image_label.setPixmap(pix) 
 
             np.save(self.dir+'/'+self.name,self.cursor) 
+            np.savetxt(self.dir+'/'+self.name[:-4]+'.txt', self.cursor, fmt='%s', delimiter=',', newline=' ', header='', footer='', comments='# ', encoding=None)
 
     def filter(self):
 
