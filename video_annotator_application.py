@@ -9,7 +9,7 @@ import pyautogui as pg
 import os
 import time
 from PyQt5.QtWidgets import QApplication, QWidget,QPushButton,QHBoxLayout,QVBoxLayout,QStyle,QFileDialog,QLabel,QLineEdit,QCheckBox
-
+import time
 class Window(QWidget):
     def __init__(self):
         super().__init__()
@@ -32,7 +32,7 @@ class Window(QWidget):
         self.image_label.resize(self.disply_width, self.display_height)
 
 
-        self.openBtn=QPushButton('Open Video (o)')
+        self.openBtn=QPushButton('Open(o)')
         self.openlabel=QLabel("o")
         self.openBtn.clicked.connect(self.open_file)
         self.openBtn.setShortcut('o')
@@ -46,7 +46,7 @@ class Window(QWidget):
         self.line_editlabel=QLabel("    ")
         self.line_edit = QLabel("    ")
        
-        self.pauseBtn=QPushButton('(space)')
+        self.pauseBtn=QPushButton('(SP)')
         self.pauseBtn.setEnabled(False)
         self.pauseBtn.setIcon(self.style().standardIcon(QStyle.SP_MediaPause))
         self.pauseBtn.clicked.connect(self.pauseVideo)
@@ -70,7 +70,7 @@ class Window(QWidget):
         
         self.brightness_value_now = 30 # Updated brightness value
 
-        self.filterBtn=QCheckBox('Filter (f)')
+        self.filterBtn=QCheckBox('(f)')
         self.filterBtn.setShortcut('f')
         self.filterlabel=QLabel("f")
 
@@ -78,8 +78,17 @@ class Window(QWidget):
         self.cursorBtn.setShortcut('c')
         self.cursorlabel=QLabel("c")
 
-        self.line = QLineEdit(self)
-        self.linelabel=QLabel("Label")
+        self.lBtn2=QCheckBox('2')
+        self.lBtn2.setShortcut('2')
+
+        self.lBtn3=QCheckBox('3')
+        self.lBtn3.setShortcut('3')
+
+        self.lBtn4=QCheckBox('4')
+        self.lBtn4.setShortcut('4')
+
+        #self.line = QLineEdit(self)
+        #self.linelabel=QLabel("Label")
 
         hbox=QHBoxLayout()
         hbox.setContentsMargins(0,0,0,0)
@@ -98,7 +107,10 @@ class Window(QWidget):
         #
 
         hbox.addWidget(self.filterBtn)
-        hbox.addWidget(self.line)
+        #hbox.addWidget(self.line)
+        hbox.addWidget(self.lBtn2)
+        hbox.addWidget(self.lBtn3)
+        hbox.addWidget(self.lBtn4)
 
         hbox.addWidget(self.cursorBtn)
         #
@@ -111,7 +123,7 @@ class Window(QWidget):
         hbox1.addWidget(self.pauselabel)
         hbox1.addWidget(self.nextlabel)
         hbox1.addWidget(self.filterlabel)
-        hbox1.addWidget(self.linelabel)
+        #hbox1.addWidget(self.linelabel)
         hbox1.addWidget(self.cursorlabel)
         hbox1.setSpacing(1)
         
@@ -149,7 +161,7 @@ class Window(QWidget):
         self.timer.timeout.connect(self.nextFrameSlot)
         self.timer.setTimerType(Qt.PreciseTimer)
         fps = int(self.cap.get(cv2.CAP_PROP_FPS))
-        self.millisecs = int(1000.0 / fps)*10#mobinaa
+        self.millisecs = int(1000.0 / fps)#mobinaa
         self.timer.start(self.millisecs)
         
         self.line_editlabel.setText(' / ' +str(int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))*self.millisecs/1000))
@@ -166,7 +178,8 @@ class Window(QWidget):
         
 
     def open_file(self):
-        self.filename,_=QFileDialog.getOpenFileName(self,"Open Video (o)")
+        self.start=time.time()
+        self.filename,_=QFileDialog.getOpenFileName(self,"Open(o)")
         self.cap=0
 
 
@@ -207,7 +220,7 @@ class Window(QWidget):
 
 
     def bbackward_video(self):
-        self.frame_num-=100
+        self.frame_num-=10
 
 
     def forward_video(self):
@@ -220,7 +233,7 @@ class Window(QWidget):
 
 
     def fforward_video(self):
-        self.frame_num+=100
+        self.frame_num+=10
 
 
     def nextFrameSlot(self):
@@ -246,7 +259,7 @@ class Window(QWidget):
                 self.unsetCursor()
             cv2.circle(self.frame,(int(self.cursor[self.frame_num-1][0]*self.image_label.width()),int(self.cursor[self.frame_num-1][1]*self.image_label.height())),radius=10,color=(0,255,0),thickness=-1)
 
-            if self.line.text()=='2':
+            if self.lBtn2.isChecked()==True: #and self.line.text()=='2':
                 self.setCursor(Qt.BlankCursor)
                 numm=[(pg.position()[0]-self.pos().x()-self.image_label.x())/self.image_label.width(),(pg.position()[1]-self.pos().y()-self.image_label.y())/self.image_label.height()]
                
@@ -261,7 +274,7 @@ class Window(QWidget):
                 self.frame=cv2.line(self.frame,(int(self.image_label.width()/2+0.1*self.image_label.width()),0),(int(self.image_label.width()/2+0.1*self.image_label.width()),self.image_label.height()),(255,0,255),5)
              
 
-            elif self.line.text()=='3':
+            elif self.lBtn3.isChecked()==True:# and self.line.text()=='3':
                 self.setCursor(Qt.BlankCursor)
                 numm=[(pg.position()[0]-self.pos().x()-self.image_label.x())/self.image_label.width(),(pg.position()[1]-self.pos().y()-self.image_label.y())/self.image_label.height()]
                 
@@ -282,7 +295,7 @@ class Window(QWidget):
                 self.frame=cv2.line(self.frame,(int(2*self.image_label.width()/3-0.05*self.image_label.width()),0),(int(2*self.image_label.width()/3-0.05*self.image_label.width()),self.image_label.height()),(255,0,255),5)
                 self.frame=cv2.line(self.frame,(int(2*self.image_label.width()/3+0.05*self.image_label.width()),0),(int(2*self.image_label.width()/3+0.05*self.image_label.width()),self.image_label.height()),(255,0,255),5)
     
-            elif self.line.text()=='4':
+            elif self.lBtn4.isChecked()==True:# and self.line.text()=='4':
                 self.setCursor(Qt.BlankCursor)
                 numm=[(pg.position()[0]-self.pos().x()-self.image_label.x())/self.image_label.width(),(pg.position()[1]-self.pos().y()-self.image_label.y())/self.image_label.height()]
                 
@@ -317,9 +330,12 @@ class Window(QWidget):
             pix = QPixmap.fromImage(img)            
 
             self.image_label.setPixmap(pix) 
+            self.end=time.time()
+            self.td=self.end-self.start
 
             np.save(self.dir+'/'+self.name,self.cursor) 
             np.savetxt(self.dir+'/'+self.name[:-4]+'.txt', self.cursor, fmt='%s', delimiter=',', newline=' ', header='', footer='', comments='# ', encoding=None)
+            np.save(self.dir+'/'+self.name[:-4]+'_time'+'.npy', self.td)
 
     def filter(self):
 
